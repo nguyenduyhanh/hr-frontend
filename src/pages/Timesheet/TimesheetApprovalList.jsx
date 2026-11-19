@@ -219,7 +219,11 @@ const TimesheetApprovalList = () => {
             width: 170,
             render: (rowData) => {
                 const details = rowData.details || [];
-                if (details.length === 0) return '---';
+                if (details.length === 0) {
+                    return rowData.note ? (
+                        <span className="text-emerald-600 font-medium text-[12px]">{rowData.note}</span>
+                    ) : '---';
+                }
                 return (
                     <div className="space-y-0.5">
                         {details.map((d, idx) => d.shift && (

@@ -418,6 +418,9 @@ const TimekeepingSummary = () => {
                     width: 180,
                     render: (row) => {
                         if (!row.record || !row.record.details || row.record.details.length === 0) {
+                            if (row.record?.note) {
+                                return <span className="text-emerald-600 font-medium">{row.record.note}</span>;
+                            }
                             return <span className="text-gray-400">{t('timekeeping.absent_or_leave', 'Vắng / Nghỉ')}</span>;
                         }
                         return (
