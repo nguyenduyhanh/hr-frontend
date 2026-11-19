@@ -96,6 +96,27 @@ const TimekeepingSummary = () => {
         loadData();
     }, [filters]);
 
+    // Fetch departments and staffs metadata on mount
+    useEffect(() => {
+        const fetchMetadata = async () => {
+            try {
+                const [deptRes, staffRes] = await Promise.all([
+                    getDepartments(),
+                    pagingStaffs({ pageIndex: 1, pageSize: 10000 })
+                ]);
+                if (deptRes?.data) {
+                    setDepartments(deptRes.data.content || deptRes.data || []);
+                }
+                if (staffRes?.data) {
+                    setStaffList(staffRes.data.content || staffRes.data || []);
+                }
+            } catch (err) {
+                console.error('Error fetching metadata for timekeeping summary:', err);
+            }
+        };
+        fetchMetadata();
+    }, []);
+
     // Handle form submit
     const handleFormSubmit = (values) => {
         setFilters({
@@ -154,8 +175,27 @@ const TimekeepingSummary = () => {
     const aggregatedData = useMemo(() => {
         if (filters.staffId) return []; // Skip in single employee mode
 
+        // Combine staffList with any staff found in timesheets so data is always present
+        const staffMap = new Map();
+        (staffList || []).forEach(s => {
+            if (s.id) staffMap.set(s.id, s);
+        });
+        (timesheets || []).forEach(ts => {
+            if (ts.staffId && !staffMap.has(ts.staffId)) {
+                staffMap.set(ts.staffId, {
+                    id: ts.staffId,
+                    staffCode: ts.staffCode || '---',
+                    displayName: ts.staffName || '---',
+                    departmentName: ts.departmentName || '---',
+                    positionName: ts.positionName || '---',
+                    department: ts.departmentName ? { id: ts.departmentId, name: ts.departmentName } : null
+                });
+            }
+        });
+        const allStaffs = Array.from(staffMap.values());
+
         // Filter staff based on active department & keyword filter
-        const targetStaffs = staffList.filter(s => {
+        const targetStaffs = allStaffs.filter(s => {
             if (filters.departmentId && s.department?.id !== filters.departmentId) return false;
             if (keywordFilter) {
                 const kw = keywordFilter.toLowerCase();
@@ -214,7 +254,17 @@ const TimekeepingSummary = () => {
         if (daysDiff < 0 || daysDiff > 92) return []; // Safeguard range
 
         const rows = [];
-        const staff = staffList.find(s => s.id === filters.staffId);
+        const staff = staffList.find(s => s.id === filters.staffId) || 
+            (() => {
+                const ts = timesheets.find(t => t.staffId === filters.staffId);
+                return ts ? {
+                    id: ts.staffId,
+                    staffCode: ts.staffCode || '---',
+                    displayName: ts.staffName || '---',
+                    departmentName: ts.departmentName || '---',
+                    positionName: ts.positionName || '---'
+                } : null;
+            })();
 
         for (let i = 0; i <= daysDiff; i++) {
             const date = start.add(i, 'day');
