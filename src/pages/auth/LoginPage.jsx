@@ -10,7 +10,10 @@ import {
   VisibilityOff,
   Shield,
   LightMode,
-  DarkMode
+  DarkMode,
+  InfoOutlined,
+  AutoAwesome,
+  ContentCopy
 } from '@mui/icons-material';
 import { toast } from 'sonner';
 import useAuthStore from '../../store/useAuthStore';
@@ -169,6 +172,61 @@ const LoginPage = () => {
                   <span>Đăng nhập</span>
                 )}
               </Button>
+
+              {/* Demo Account Box for Recruiters / Reviewers */}
+              <div className="mt-5 p-3.5 rounded-xl bg-primary/5 dark:bg-primary/10 border border-primary/20 flex flex-col gap-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+                    <InfoOutlined className="text-[16px]" />
+                    <span>Tài khoản trải nghiệm (Demo)</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      formik.setFieldValue('username', 'admin');
+                      formik.setFieldValue('password', 'Admin@123');
+                      toast.success('Đã tự động điền tài khoản Admin!');
+                    }}
+                    className="text-[11px] font-semibold text-primary hover:text-primary-foreground hover:bg-primary bg-primary/10 px-2.5 py-1 rounded-md transition-all cursor-pointer flex items-center gap-1 active:scale-95"
+                    title="Bấm để tự động điền thông tin đăng nhập"
+                  >
+                    <AutoAwesome className="text-[13px]" />
+                    Điền nhanh
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-primary/10">
+                  <div
+                    onClick={() => {
+                      navigator.clipboard.writeText('admin');
+                      toast.success('Đã chép tên đăng nhập: admin');
+                    }}
+                    className="flex flex-col p-2 rounded-lg bg-card/60 hover:bg-card border border-border/60 transition-colors cursor-pointer group"
+                    title="Bấm để sao chép"
+                  >
+                    <span className="text-[10px] text-muted-foreground uppercase font-medium">Tên đăng nhập</span>
+                    <div className="flex items-center justify-between font-mono font-semibold text-foreground text-[13px] mt-0.5">
+                      <span>admin</span>
+                      <ContentCopy className="text-[13px] text-muted-foreground group-hover:text-primary transition-colors" />
+                    </div>
+                  </div>
+
+                  <div
+                    onClick={() => {
+                      navigator.clipboard.writeText('Admin@123');
+                      toast.success('Đã chép mật khẩu: Admin@123');
+                    }}
+                    className="flex flex-col p-2 rounded-lg bg-card/60 hover:bg-card border border-border/60 transition-colors cursor-pointer group"
+                    title="Bấm để sao chép"
+                  >
+                    <span className="text-[10px] text-muted-foreground uppercase font-medium">Mật khẩu</span>
+                    <div className="flex items-center justify-between font-mono font-semibold text-foreground text-[13px] mt-0.5">
+                      <span>Admin@123</span>
+                      <ContentCopy className="text-[13px] text-muted-foreground group-hover:text-primary transition-colors" />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </form>
           </FormikProvider>
         </div>

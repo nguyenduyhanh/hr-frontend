@@ -188,7 +188,7 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
                     <Autocomplete
                         name={`configuredItems[${index}].salaryItem`}
                         options={cellAvailableItems}
-                        displayData="name"
+                        getOptionLabel={(option) => option?.code ? `${option.name} (${option.code})` : option?.name || ''}
                         placeholder="Chọn khoản lương..."
                         noMargin={true}
                         onChange={(_, newValue) => {
